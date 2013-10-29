@@ -19,18 +19,24 @@ void instr_txs(void) {
 }
 
 void instr_pha(void) {
-    MEMORY_BLOCK[reg_SP.data] = reg_A.data;
+    unsigned short stack_index = reg_SP.page_index << 8;
+    stack_index += reg_SP.data;
+    MEMORY_BLOCK[stack_index] = reg_A.data;
     reg_SP.data--;
 }
 
 void instr_php(void) {
-    MEMORY_BLOCK[reg_SP.data] = reg_PSR.data.reg;
+    unsigned short stack_index = reg_SP.page_index << 8;
+    stack_index += reg_SP.data;
+    MEMORY_BLOCK[stack_index] = reg_PSR.data.reg;
     reg_SP.data--;
 }
 
 void instr_pla(void) {
+    unsigned short stack_index = reg_SP.page_index << 8;
     reg_SP.data++;
-    reg_A.data = MEMORY_BLOCK[reg_SP.data];
+    stack_index += reg_SP.data;
+    reg_A.data = MEMORY_BLOCK[stack_index];
     /* set zero flag if appropriate */
     if (reg_A.data == 0x00) {
         reg_PSR.data.flags.Z = 1;
@@ -42,7 +48,9 @@ void instr_pla(void) {
 }
 
 void instr_plp(void) {
+    unsigned short stack_index = reg_SP.page_index << 8;
     reg_SP.data++;
-    reg_PSR.data.reg = MEMORY_BLOCK[reg_SP.data];
+    stack_index += reg_SP.data;
+    reg_PSR.data.reg = MEMORY_BLOCK[stack_index];
 }
 

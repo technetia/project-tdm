@@ -25,12 +25,12 @@ int main(int argc, char *argv[]) {
     printf("PSR N: %d\n", reg_PSR.data.flags.N);
     instr_php();
     printf("Execute instruction PHP\n");
-    printf("SP: %d\n", reg_SP.data);
+    printf("SP: %d\n", (reg_SP.page_index << 8) + reg_SP.data);
     printf("PSR Z: %d\n", reg_PSR.data.flags.Z);
     printf("PSR N: %d\n", reg_PSR.data.flags.N);
     instr_pla();
     printf("Execute instruction PLA\n");
-    printf("SP: %d\n", reg_SP.data);
+    printf("SP: %d\n", (reg_SP.page_index << 8) + reg_SP.data);
     printf("PSR Z: %d\n", reg_PSR.data.flags.Z);
     printf("PSR N: %d\n", reg_PSR.data.flags.N);
     return 0;
