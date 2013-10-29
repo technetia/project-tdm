@@ -1,10 +1,12 @@
 #include "registers.h"
+#include "instructions.h"
 #include <stdio.h>
 
 int main(int argc, char *argv[]) {
     ProcessorStatusRegister p;
-    p.data.reg = 0x80;
-    printf("%d\n", p.data.flags.N);
+    init_psr(&p);
+    instr_clc(&p);
+    printf("%d\n", p.data.flags.C);
     return 0;
 }
 

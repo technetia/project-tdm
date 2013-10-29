@@ -69,9 +69,9 @@ typedef struct ProcessorStatusRegister {
             unsigned char B : 1;
             /*
             BIT 5
-            U - unused
+            X - unused
             */
-            unsigned char U : 1;
+            unsigned char X : 1;
             /*
             BIT 6
             V - overflow
@@ -89,7 +89,7 @@ typedef struct ProcessorStatusRegister {
 #else /* little endian architecture */
             unsigned char N : 1;
             unsigned char V : 1;
-            unsigned char U : 1;
+            unsigned char X : 1;
             unsigned char B : 1;
             unsigned char D : 1;
             unsigned char I : 1;
@@ -103,6 +103,8 @@ typedef struct ProcessorStatusRegister {
 /* ---
 Function declarations.
 ---*/
+
+void init_psr(ProcessorStatusRegister *);
 
 #endif /* __PROJECT_TDM__REGISTERS_H__ */
 
