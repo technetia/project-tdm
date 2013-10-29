@@ -20,7 +20,9 @@ Page 255 (0xFF00-0xFFFF)
 - to be figured out
 */
 
-char MEMORY_BLOCK[65536];
+extern char MEMORY_BLOCK[];
+
+void init_memory(void);
 
 #endif /* __PROJECT_TDM__MEMORY_H__ */
 
