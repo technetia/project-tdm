@@ -2,35 +2,21 @@
 #define __PROJECT_TDM__REGISTERS_H__
 
 /* ---
-Structure declarations.
+Accumulator register, as well as the two index registers.
+(Named X and Y.)
 --- */
-
-/*
-General-purpose registers.
-
-The 6502 has three of these.
-*/
-typedef struct GeneralRegister {
+struct {
     unsigned char data;
-} GeneralRegister;
+} reg_A, reg_X, reg_Y;
 
-/*
-Special-purpose registers.
-
-The 6502 has two of these.
-*/
-typedef struct SpecialRegister {
-    unsigned char data;
-} SpecialRegister;
-
-/*
+/* ---
 Processor status register.
 
 Not directly accessible by any 6502 instruction.
 
 However, each bit is a flag that can be tested by the 6502 instructions.
-*/
-typedef struct ProcessorStatusRegister {
+--- */
+struct {
     union {
         unsigned char reg;
         struct {
@@ -58,6 +44,7 @@ typedef struct ProcessorStatusRegister {
             BIT 3
             D - decimal mode
             1 if decimal mode active
+            decimal mode means BCD will be used
             */
             unsigned char D : 1;
             /*
@@ -98,13 +85,30 @@ typedef struct ProcessorStatusRegister {
 #endif
         } flags;
     } data;
-} ProcessorStatusRegister;
+} reg_PSR;
 
 /* ---
-Function declarations.
----*/
+Program counter (PC).
+--- */
+struct {
+    unsigned short data;
+} reg_PC;
 
-void init_psr(ProcessorStatusRegister *);
+/* ---
+Stack pointer (SP).
+
+The stack pointer is technically 16-bit, but the 6502 assumes
+the high-order byte is always 0x01, i.e. page 1 of memory.
+--- */
+struct {
+    unsigned char data;
+    unsigned char page_index;
+} reg_SP;
+
+/* ---
+Call to initialize registers.
+--- */
+void init_registers(void);
 
 #endif /* __PROJECT_TDM__REGISTERS_H__ */
 

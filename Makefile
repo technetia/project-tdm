@@ -1,6 +1,6 @@
 CXX = gcc
 CXXFLAGS = -g -Wall
-OBJECTS = registers.o instructions.o test.o
+OBJECTS = memory.o registers.o flag_instructions.o test.o
 DEPENDS = ${OBJECTS:.o=.d}
 EXEC = test
 
