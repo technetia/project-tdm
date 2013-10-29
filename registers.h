@@ -6,7 +6,7 @@ Accumulator register, as well as the two index registers.
 (Named X and Y.)
 --- */
 struct {
-    unsigned char data;
+    signed char data;
 } reg_A, reg_X, reg_Y;
 
 /* ---
