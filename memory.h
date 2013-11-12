@@ -17,7 +17,7 @@ Page 1 (0x0100-0x01FF)
 - reserved for stack
 
 Page 255 (0xFF00-0xFFFF)
-- to be figured out
+- last 6 bytes (0xFFFA-0xFFFF) reserved for interrupt/reset
 */
 
 extern char MEMORY_BLOCK[];

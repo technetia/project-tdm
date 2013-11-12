@@ -57,6 +57,7 @@ struct {
             /*
             BIT 5
             X - unused
+            always set to 1 (probably not a good idea to depend on this)
             */
             unsigned char X : 1;
             /*
@@ -109,6 +110,11 @@ struct {
 Call to initialize registers.
 --- */
 void init_registers(void);
+
+/* ---
+Full SP getter.
+--- */
+unsigned short get_full_SP(void);
 
 #endif /* __PROJECT_TDM__REGISTERS_H__ */
 

@@ -19,23 +19,21 @@ void instr_txs(void) {
 }
 
 void instr_pha(void) {
-    unsigned short stack_index = reg_SP.page_index << 8;
-    stack_index += reg_SP.data;
+    unsigned short stack_index = get_full_SP();
     MEMORY_BLOCK[stack_index] = reg_A.data;
     reg_SP.data--;
 }
 
 void instr_php(void) {
-    unsigned short stack_index = reg_SP.page_index << 8;
-    stack_index += reg_SP.data;
+    unsigned short stack_index = get_full_SP();
     MEMORY_BLOCK[stack_index] = reg_PSR.data.reg;
     reg_SP.data--;
 }
 
 void instr_pla(void) {
-    unsigned short stack_index = reg_SP.page_index << 8;
+    unsigned short stack_index;
     reg_SP.data++;
-    stack_index += reg_SP.data;
+    stack_index = get_full_SP();
     reg_A.data = MEMORY_BLOCK[stack_index];
     /* set zero flag if appropriate */
     if (reg_A.data == 0x00) {
@@ -48,9 +46,9 @@ void instr_pla(void) {
 }
 
 void instr_plp(void) {
-    unsigned short stack_index = reg_SP.page_index << 8;
+    unsigned short stack_index;
     reg_SP.data++;
-    stack_index += reg_SP.data;
+    stack_index = get_full_SP();
     reg_PSR.data.reg = MEMORY_BLOCK[stack_index];
 }
 
