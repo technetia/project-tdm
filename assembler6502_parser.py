@@ -72,8 +72,7 @@ def _parse_opcode_nop(tokens):
 
     Null instruction.
     """
-    if tokens:
-        raise ParseError("Too many arguments for NOP")
+    assert len(tokens) == 0
     return ("EA",)
 
 def _parse_opcode_ora(tokens):
@@ -119,7 +118,65 @@ def _parse_opcode_sbc(tokens):
     return 0
 
 def _parse_opcode_sta(tokens):
-    return 0
+    """
+    Opcode STA.
+
+    Stores a value from memory into the accumulator.
+    """
+    assert len(tokens) in (1, 3, 5)
+
+    if len(tokens) == 1:
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"] \
+                or tokens[0].type == tokenizer.TOKEN_TYPES["LONGINT"]
+        
+        sta_int = tokens[0].lexeme.lstrip("$")
+        if tokens[0].type == tokenizer.TOKEN_TYPES["INT"]:
+            # zero page
+            return ("85", sta_int)
+        else:
+            # absolute
+            return ("8D", sta_int[:2], sta_int[2:])
+    elif len(tokens) == 3:
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"] \
+                or tokens[0].type == tokenizer.TOKEN_TYPES["LONGINT"]
+        assert tokens[1].type == tokenizer.TOKEN_TYPES["COMMA"]
+        assert tokens[2].type == tokenizer.TOKEN_TYPES["IDENT"]
+        if tokens[0].type == tokenizer.TOKEN_TYPES["INT"]:
+            assert tokens[2].lexeme.upper() == "X"
+        else:
+            assert tokens[2].lexeme.upper() == "X" or tokens[2].lexeme.upper() == "Y"
+
+        sta_int = tokens[0].lexeme.lstrip("$")
+        if tokens[0].type == tokenizer.TOKEN_TYPES["INT"]:
+            # zero page X
+            return ("95", sta_int)
+        else:
+            if tokens[2].lexeme.upper() == "X":
+                # absolute X
+                return ("9D", sta_int[:2], sta_int[2:])
+            else:
+                # absolute Y
+                return ("99", sta_int[:2], sta_int[2:])
+    else:
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["LPAREN"]
+        assert tokens[1].type == tokenizer.TOKEN_TYPES["INT"]
+        assert tokens[2].type == tokenizer.TOKEN_TYPES["COMMA"] \
+                or tokens[2].type == tokenizer.TOKEN_TYPES["RPAREN"]
+        if tokens[2].type == tokenizer.TOKEN_TYPES["COMMA"]:
+            assert tokens[3].type == tokenizer.TOKEN_TYPES["IDENT"]
+            assert tokens[3].lexeme.upper() == "X"
+            assert tokens[4].type == tokenizer.TOKEN_TYPES["RPAREN"]
+        else:
+            assert tokens[3].type == tokenizer.TOKEN_TYPES["COMMA"]
+            assert tokens[4].type == tokenizer.TOKEN_TYPES["IDENT"]
+            assert tokens[4].lexeme.upper() == "Y"
+
+        if tokens[2].type == tokenizer.TOKEN_TYPES["COMMA"]:
+            # indirect X
+            return ("81", tokens[1].lexeme.lstrip("$"))
+        else:
+            # indirect Y
+            return ("91", tokens[1].lexeme.lstrip("$"))
 
 def _parse_opcode_stx(tokens):
     """
@@ -127,7 +184,7 @@ def _parse_opcode_stx(tokens):
 
     Stores a value from memory into the X register.
     """
-    assert len(tokens) == 1 or len(tokens) == 3
+    assert len(tokens) in (1, 3)
 
     stx_int = tokens[0].lexeme.lstrip("$")
     if len(tokens) == 1:
@@ -145,7 +202,7 @@ def _parse_opcode_stx(tokens):
         assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"]
         assert tokens[1].type == tokenizer.TOKEN_TYPES["COMMA"]
         assert tokens[2].type == tokenizer.TOKEN_TYPES["IDENT"]
-        assert tokens[2].lexeme == "Y"
+        assert tokens[2].lexeme.upper() == "Y"
         return ("96", stx_int)
 
 def _parse_opcode_sty(tokens):
@@ -172,14 +229,26 @@ def _parse_opcode_sty(tokens):
         assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"]
         assert tokens[1].type == tokenizer.TOKEN_TYPES["COMMA"]
         assert tokens[2].type == tokenizer.TOKEN_TYPES["IDENT"]
-        assert tokens[2].lexeme == "X"
+        assert tokens[2].lexeme.upper() == "X"
         return ("94", sty_int)
 
 def _parse_opcode_tsx(tokens):
-    return 0
+    """
+    Opcode TSX.
+
+    Transfers contents of stack pointer to X.
+    """
+    assert len(tokens) == 0
+    return ("BA",)
 
 def _parse_opcode_txs(tokens):
-    return 0
+    """
+    Opcode TXS.
+
+    Transfers contents of X to stack pointer.
+    """
+    assert len(tokens) == 0
+    return ("9A",)
 
 def _parse_opcode(tokens):
     op_token = tokens[0]
