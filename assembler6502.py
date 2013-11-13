@@ -11,9 +11,8 @@ def output_byte(hexcode):
 def main():
     code = """
 ; sample code
-beginning: jsr $5597
-second:
-    rts
+beginning:
+    sty $44,X
     """
     for line in code.split("\n"):
         hexcodes = parser.parse_line(line)

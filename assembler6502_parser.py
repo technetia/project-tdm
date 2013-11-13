@@ -149,7 +149,31 @@ def _parse_opcode_stx(tokens):
         return ("96", stx_int)
 
 def _parse_opcode_sty(tokens):
-    return 0
+    """
+    Opcode STY.
+
+    Stores a value from memory into the Y register.
+    """
+    assert len(tokens) == 1 or len(tokens) == 3
+
+    sty_int = tokens[0].lexeme.lstrip("$")
+    if len(tokens) == 1:
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"] \
+                or tokens[0].type == tokenizer.TOKEN_TYPES["LONGINT"]
+
+        if tokens[0].type == tokenizer.TOKEN_TYPES["INT"]:
+            # zero page
+            return ("84", sty_int)
+        else:
+            # absolute
+            return ("8C", sty_int[:2], sty_int[2:])
+    else:
+        # zero page X
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"]
+        assert tokens[1].type == tokenizer.TOKEN_TYPES["COMMA"]
+        assert tokens[2].type == tokenizer.TOKEN_TYPES["IDENT"]
+        assert tokens[2].lexeme == "X"
+        return ("94", sty_int)
 
 def _parse_opcode_tsx(tokens):
     return 0
@@ -160,29 +184,39 @@ def _parse_opcode_txs(tokens):
 def _parse_opcode(tokens):
     op_token = tokens[0]
     try:
+        # look up appropriate opcode function and retrieve hexcodes
         hexcodes = globals()[
                 "_parse_opcode_{}".format(op_token.lexeme.lower())](tokens[1:])
     except(KeyError):
+        # opcode doesn't exist, syntax error
         raise ParseError("Invalid opcode {}".format(op_token.lexeme))
     else:
         return hexcodes
 
 def parse_line(line):
+    # tokenize line of code
     tokens = tokenizer.scan(line)
+    # if not a blank line
     if tokens:
         start_token = tokens[0]
+        # if the first token is a label
         if start_token.type == tokenizer.TOKEN_TYPES["LABEL"]:
             try:
+                # see if there's anything after
                 start_token = tokens[1]
             except(IndexError):
                 # line with label only, done processing
                 return tuple()
             else:
+                # otherwise line is basically equivalent without label
                 del tokens[0]
 
+        # if the first (second) token is an identifier (opcode)
         if start_token.type == tokenizer.TOKEN_TYPES["IDENT"]:
+            # obtain the hexcodes from parsing the opcode
             hexcodes = _parse_opcode(tokens)
         else:
+            # otherwise the line is syntactically invalid
             raise ParseError("Invalid starting token {}".format(start_token.lexeme))
 
         return hexcodes
