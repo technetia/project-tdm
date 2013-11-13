@@ -129,15 +129,24 @@ def _parse_opcode_stx(tokens):
     """
     assert len(tokens) == 1 or len(tokens) == 3
 
+    stx_int = tokens[0].lexeme.lstrip("$")
     if len(tokens) == 1:
         assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"] \
                 or tokens[0].type == tokenizer.TOKEN_TYPES["LONGINT"]
+
+        if tokens[0].type == tokenizer.TOKEN_TYPES["INT"]:
+            # zero page
+            return ("86", stx_int)
+        else:
+            # absolute
+            return ("8E", stx_int[:2], stx_int[2:])
     else:
+        # zero page Y
         assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"]
         assert tokens[1].type == tokenizer.TOKEN_TYPES["COMMA"]
         assert tokens[2].type == tokenizer.TOKEN_TYPES["IDENT"]
         assert tokens[2].lexeme == "Y"
-        return ("96", tokens[0].lexeme.lstrip("$"))
+        return ("96", stx_int)
 
 def _parse_opcode_sty(tokens):
     return 0
