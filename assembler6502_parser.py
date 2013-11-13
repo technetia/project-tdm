@@ -43,10 +43,14 @@ def _parse_opcode_jmp(tokens):
     return 0
 
 def _parse_opcode_jsr(tokens):
-    if not tokens or len(tokens) > 1:
-        raise ParseError("Incorrect # of arguments for JSR (expected 1, got {})".format(len(tokens)))
-    if tokens[0].type != tokenizer.TOKEN_TYPES["LONGINT"]:
-        raise ParseError("Expected LONGINT for JSR")
+    """
+    Opcode JSR.
+
+    Pushes the next instruction's address-1 onto the stack,
+    then moves program control to argument.
+    """
+    assert len(tokens) == 1
+    assert tokens[0].type == tokenizer.TOKEN_TYPES["LONGINT"]
     jsr_addr = tokens[0].lexeme.lstrip("$")
     return ("20", jsr_addr[:2], jsr_addr[2:])
 
@@ -99,8 +103,7 @@ def _parse_opcode_rti(tokens):
 
     Returns from an interrupt.
     """
-    if tokens:
-        raise ParseError("Too many arguments for RTI")
+    assert len(tokens) == 0
     return ("40",)
 
 def _parse_opcode_rts(tokens):
@@ -109,8 +112,7 @@ def _parse_opcode_rts(tokens):
 
     Returns from a subroutine invoked by JSR.
     """
-    if tokens:
-        raise ParseError("Too many arguments for RTS")
+    assert len(tokens) == 0
     return ("60",)
 
 def _parse_opcode_sbc(tokens):
@@ -120,7 +122,22 @@ def _parse_opcode_sta(tokens):
     return 0
 
 def _parse_opcode_stx(tokens):
-    return 0
+    """
+    Opcode STX.
+
+    Stores a value from memory into the X register.
+    """
+    assert len(tokens) == 1 or len(tokens) == 3
+
+    if len(tokens) == 1:
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"] \
+                or tokens[0].type == tokenizer.TOKEN_TYPES["LONGINT"]
+    else:
+        assert tokens[0].type == tokenizer.TOKEN_TYPES["INT"]
+        assert tokens[1].type == tokenizer.TOKEN_TYPES["COMMA"]
+        assert tokens[2].type == tokenizer.TOKEN_TYPES["IDENT"]
+        assert tokens[2].lexeme == "Y"
+        return ("96", tokens[0].lexeme.lstrip("$"))
 
 def _parse_opcode_sty(tokens):
     return 0
