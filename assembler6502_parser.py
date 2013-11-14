@@ -268,13 +268,13 @@ def parse_line(line):
     # if not a blank line
     if tokens:
         start_token = tokens[0]
-        # if the first token is a label
-        if start_token.type == tokenizer.TOKEN_TYPES["LABEL"]:
+        # if the initial token(s) is/are label(s)
+        while start_token.type == tokenizer.TOKEN_TYPES["LABEL"]:
             try:
                 # see if there's anything after
                 start_token = tokens[1]
             except(IndexError):
-                # line with label only, done processing
+                # line with label(s) only, done processing
                 return tuple()
             else:
                 # otherwise line is basically equivalent without label
